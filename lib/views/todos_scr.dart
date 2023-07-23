@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:todo_app_practice_2/models/todo_model.dart';
 import 'package:todo_app_practice_2/services/firebase_crud.dart';
 import 'package:todo_app_practice_2/utils/color_constant.dart';
 import 'package:todo_app_practice_2/views/create_user_box.dart';
 import 'package:todo_app_practice_2/views/done_scr.dart';
+import 'package:todo_app_practice_2/views/update_user_box_scr.dart';
 import 'package:todo_app_practice_2/widgets/custom_appbar.dart';
 
 class TodosScreen extends StatefulWidget {
@@ -14,6 +16,7 @@ class TodosScreen extends StatefulWidget {
 
 class _TodosState extends State<TodosScreen> {
   int? selectedTileIndex;
+  List<User> userList = [];
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -39,12 +42,15 @@ class _TodosState extends State<TodosScreen> {
                     child: Dismissible(
                       key: ValueKey(snapshot.data![index].id),
                       onDismissed: (direction) {
-                        FirebaseCRUD().deleteUser(snapshot.data![index]);
+                        if (direction == DismissDirection.startToEnd ||
+                            direction == DismissDirection.endToStart) {
+                          FirebaseCRUD().deleteUser(snapshot.data![index]);
+                        }
                       },
                       background: Container(
                         padding: const EdgeInsets.only(left: 20),
                         alignment: Alignment.centerLeft,
-                        color: Colors.red,
+                        color: Color(ConstantColors.redColor),
                         child: const Icon(Icons.delete),
                       ),
                       child: ListTile(
@@ -57,7 +63,7 @@ class _TodosState extends State<TodosScreen> {
                             decoration: BoxDecoration(
                                 color: selectedTileIndex == index
                                     ? Color(ConstantColors.primarycolor)
-                                    : Color(ConstantColors.secondaryColor),
+                                    : Color(ConstantColors.whiteColor),
                                 shape: BoxShape.rectangle),
                             child: selectedTileIndex == index
                                 ? Icon(
@@ -73,15 +79,32 @@ class _TodosState extends State<TodosScreen> {
                               } else {
                                 selectedTileIndex = index;
                                 Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const DoneScreen(),
-                                  ),
-                                );
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DoneScreen(
+                                        selectedTileIndex: index,
+                                        user: User(
+                                          id: snapshot.data![index].id,
+                                          name: snapshot.data![index].name,
+                                          task: snapshot.data![index].task,
+                                        ),
+                                      ),
+                                    ));
                               }
                             });
                           },
                         ),
+                        trailing: IconButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => UpdateUserAlertBox(
+                                    id: snapshot.data![index].id,
+                                    name: snapshot.data![index].name,
+                                    task: snapshot.data![index].task),
+                              );
+                            },
+                            icon: const Icon(Icons.edit)),
                       ),
                     ),
                   );

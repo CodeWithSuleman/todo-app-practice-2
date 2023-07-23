@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_app_practice_2/firebase_options.dart';
-import 'package:todo_app_practice_2/views/bottom_nav_bar_scr.dart';
+import 'package:todo_app_practice_2/views/todos_scr.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,9 +18,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.indigo,
+          primarySwatch: Colors.red,
           brightness: Brightness.dark,
         ),
-        home: const BottomNavBarScreen());
+        home: const TodosScreen());
   }
 }
